@@ -10,6 +10,9 @@ namespace e_comerce_website.Pages
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
+
+
+
         }
 
     
