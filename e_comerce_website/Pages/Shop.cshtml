@@ -1,10 +1,8 @@
 ﻿@page
-@model e_comerce_website.Pages.ShopModel
+@model e_commerce_website.Pages.ShopModel
 @{
-    ViewData["Title"] = "Shop page";
+    ViewData["Title"] = "Shop Page";
 }
-
-
 <!-- Hero Section Begin -->
 <section class="hero hero-normal">
     <div class="container">
@@ -250,7 +248,7 @@
                     <div class="section-title product__discount__title">
                         <h2>Sale Off</h2>
                     </div>
-                    <div class="row">
+                   @*  <div class="row">
                         <div class="product__discount__slider owl-carousel">
                             <div class="col-lg-4">
                                 <div class="product__discount__item">
@@ -361,7 +359,47 @@
                                 </div>
                             </div>
                         </div>
+                    </div> *@
+
+                    
+                    <div class="row">
+                        <div class="product__discount__slider owl-carousel">
+                            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                            {
+                                <div class="alert alert-danger">
+                                    @Model.ErrorMessage
+                                </div>
+                            }
+                            else if (Model.PagesProducts.Count == 0)
+                            {
+                                <div class="alert alert-warning">
+                                    No products found.
+                                </div>
+                            }
+                            else
+                            {
+                                foreach (var product in Model.PagesProducts)
+                                {
+                                    <div class="col-lg-4">
+                                        <h5 style="background:red !important">
+                                            <a href="#">@product.ProductName</a>
+                                        </h5>
+                                        <div class="product__discount__item__text">
+                                            <span>Category ID: @product.CategoryID</span><br />
+                                            <span>Price: @product.Price</span><br />
+                                            <span>Stock Quantity: @product.StockQuantity</span><br />
+                                            <span>Discount ID: @product.DiscountID</span>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
                     </div>
+
+
+
+
+                   
                 </div>
                 <div class="filter__item">
                     <div class="row">
@@ -579,5 +617,4 @@
         </div>
     </div>
 </section>
-<!-- Product Section End -->
 </div>
