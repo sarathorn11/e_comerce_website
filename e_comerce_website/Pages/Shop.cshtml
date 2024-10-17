@@ -364,22 +364,38 @@
                     
                     <div class="row">
                         <div class="product__discount__slider owl-carousel">
-                            @foreach (var product in Model.PagesProducts)
+                            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
                             {
-                                <div class="col-lg-4">
-                                    <h5 style="background:red !important">
-                                        <a href="#">@product.ProductName</a>
-                                    </h5>
-                                    <div class="product__discount__item__text">
-                                        <span>Category ID: @product.CategoryID</span><br />
-                                        @* <span>Price: @$product.Price</span><br /> *@
-                                        <span>Stock Quantity: @product.StockQuantity</span><br />
-                                        <span>Discount ID: @product.DiscountID</span>
-                                    </div>
+                                <div class="alert alert-danger">
+                                    @Model.ErrorMessage
                                 </div>
+                            }
+                            else if (Model.PagesProducts.Count == 0)
+                            {
+                                <div class="alert alert-warning">
+                                    No products found.
+                                </div>
+                            }
+                            else
+                            {
+                                foreach (var product in Model.PagesProducts)
+                                {
+                                    <div class="col-lg-4">
+                                        <h5 style="background:red !important">
+                                            <a href="#">@product.ProductName</a>
+                                        </h5>
+                                        <div class="product__discount__item__text">
+                                            <span>Category ID: @product.CategoryID</span><br />
+                                            <span>Price: @product.Price</span><br />
+                                            <span>Stock Quantity: @product.StockQuantity</span><br />
+                                            <span>Discount ID: @product.DiscountID</span>
+                                        </div>
+                                    </div>
+                                }
                             }
                         </div>
                     </div>
+
 
 
 
