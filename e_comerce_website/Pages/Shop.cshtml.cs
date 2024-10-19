@@ -21,6 +21,8 @@ namespace e_commerce_website.Pages
         public int product_qty { get; set; }
         public string product_img { get; set; }
         public decimal product_discount { get; set; }
+        public string product_description { get; set; }
+        public bool product_availability { get; set; }
 
 
 
@@ -47,6 +49,8 @@ namespace e_commerce_website.Pages
                             product.product_qty = reader.GetInt32(4);
                             product.product_img = reader.GetString(5);
                             product.product_discount = reader.GetDecimal(6);
+                            product.product_description = reader.GetString(7);
+                            product.product_availability = reader.GetBoolean(8);
                             PagesProducts.Add(product);
                         }
                     }
@@ -70,5 +74,7 @@ namespace e_commerce_website.Pages
         public int product_qty;
         public string product_img;
         public decimal product_discount;
+        public string product_description;
+        public bool product_availability;
     }
 }
