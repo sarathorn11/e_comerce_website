@@ -1,0 +1,114 @@
+﻿@page
+@model e_comerce_website.Pages.Manage_productModel
+@{
+    ViewData["Title"] = "Manage Products";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (!string.IsNullOrEmpty(Model.successMessage))
+{
+    <div class="alert alert-success">@Model.successMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(Model.errorMessage))
+{
+    <div class="alert alert-danger">@Model.errorMessage</div>
+}
+
+<div class="container">
+    <form method="post" class="product-form" asp-page-handler="Update">
+        <input type="hidden" asp-for="CurrentProduct.product_id" />
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_name" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_name" class="form-control" />
+            <span asp-validation-for="CurrentProduct.product_name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_category" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_category" class="form-control" />
+            <span asp-validation-for="CurrentProduct.product_category" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_price" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_price" type="number" step="0.01" class="form-control" />
+            <span asp-validation-for="CurrentProduct.product_price" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_qty" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_qty" type="number" class="form-control" />
+            <span asp-validation-for="CurrentProduct.product_qty" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_img" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_img" class="form-control" />
+            <span asp-validation-for="CurrentProduct.product_img" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_discount" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_discount" type="number" step="0.01" class="form-control" />
+            <span asp-validation-for="CurrentProduct.product_discount" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_description" class="control-label"></label>
+            <textarea asp-for="CurrentProduct.product_description" class="form-control"></textarea>
+            <span asp-validation-for="CurrentProduct.product_description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_availability" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_availability" type="checkbox" />
+            <span asp-validation-for="CurrentProduct.product_availability" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CurrentProduct.product_favorite" class="control-label"></label>
+            <input asp-for="CurrentProduct.product_favorite" type="checkbox" />
+            <span asp-validation-for="CurrentProduct.product_favorite" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Product</button>
+    </form>
+
+    <h3>Product List</h3>
+    <div class="table-container">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Image</th>
+                    <th>Discount</th>
+                    <th>Description</th>
+                    <th>Available</th>
+                    <th>Favorite</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model.Products)
+                {
+                    <tr>
+                        <td>@product.product_id</td>
+                        <td>@product.product_name</td>
+                        <td>@product.product_category</td>
+                        <td>@product.product_price.ToString("C")</td>
+                        <td>@product.product_qty</td>
+                        <td><img src="@product.product_img" alt="@product.product_name" width="50" /></td>
+                        <td>@product.product_discount %</td>
+                        <td>@product.product_description</td>
+                        <td>@(product.product_availability ? "Yes" : "No")</td>
+                        <td>@(product.product_favorite ? "Yes" : "No")</td>
+                        <td>
+                            <a asp-page-handler="Edit" asp-route-id="@product.product_id" class="btn btn-warning">Edit</a>
+                            <form method="post" asp-page-handler="Delete" style="display:inline;">
+                                <input type="hidden" name="id" value="@product.product_id" />
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
