@@ -137,7 +137,10 @@
                                 <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Shop" ? "active" : "")">
                                     <a asp-area="" asp-page="/Shop">Shop</a>
                                 </li>
-                                <li>
+                                <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Manage_product" ? "active" : "")">
+                                    <a asp-area="" asp-page="/Manage_product">Admin</a>
+                                </li>
+                                @* <li>
                                     <a href="#">Pages</a>
                                     <ul class="header__menu__dropdown">
                                         <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Shop_detail" ? "active" : "")">
@@ -153,7 +156,7 @@
                                             <a asp-area="" asp-page="/Blog_detail">Blog Detail</a>
                                         </li>
                                     </ul>
-                                </li>
+                                </li> *@
                                 <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Blog" ? "active" : "")">
                                     <a asp-area="" asp-page="/Blog">Blog</a>
                                 </li>
@@ -168,8 +171,8 @@
                     <div class="col-lg-3">
                         <div class="header__cart">
                             <ul>
-                                <li><a href="#"><i class="fa fa-heart"></i> <span>1</span></a></li>
-                                <li><a href="#"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
+                                <li><a asp-area="" asp-page="/Product_favorite"><i class="fa fa-heart"></i> <span>1</span></a></li>
+                                <li><a asp-area="" asp-page="/Shoping_cart"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
                             </ul>
                             <div class="header__cart__price">item: <span>$150.00</span></div>
                         </div>
@@ -279,6 +282,7 @@
     <script src="~/js/mixitup.min.js"></script>
     <script src="~/js/owl.carousel.min.js"></script>
     <script src="~/js/main.js"></script>
+
 
     @await RenderSectionAsync("Scripts", required: false)
 

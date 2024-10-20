@@ -1,0 +1,118 @@
+﻿@page
+@model e_comerce_website.Pages.Product_favoriteModel
+
+@{
+    ViewData["Title"] = "Favorite Products";
+}
+
+<h2 style="text-align: center;">Favorite Products</h2>
+
+<div class="table-container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th style="text-align:right !important">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.FavoriteProducts.Count == 0)
+            {
+                <tr>
+                    <td colspan="4" style="text-align:center;">No favorite products available.</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var product in Model.FavoriteProducts)
+                {
+                    <tr>
+                        <td><img src="@product.product_img" alt="@product.product_name" class="product-image" /></td>
+                        <td>@product.product_name</td>
+                        <td>$@product.product_price</td>
+                        <td style="text-align:right !important">
+                            <!-- View Details Button -->
+                            <a asp-page="/Shop_detail" asp-route-id="@product.product_id" class="btn btn-primary">View Details</a>
+                            <!-- Unfavorite Button -->
+                            <form method="post" asp-page-handler="Unfavorite" asp-route-id="@product.product_id" style="display:inline-block; margin-left: 10px;">
+                                <button type="submit" class="btn btn-danger">Unfavorite</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    /* Center the table on the page */
+    .table-container {
+        width: 80%;
+        margin: 0 auto; /* This centers the table horizontally */
+    }
+
+    /* Styling for the table */
+    .table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+        /* Styling for table headers */
+        .table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid #ddd;
+        }
+
+        /* Styling for table rows */
+        .table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            background: #fff !important;
+            text-align: left;
+        }
+
+    /* Styling for product images */
+    .product-image {
+        max-width: 100px;
+        height: auto;
+        border-radius: 8px; /* Optional: round the image corners */
+    }
+
+    /* Button styles */
+    .btn {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+    /* Heading style */
+    h2 {
+        margin-top: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+</style>
