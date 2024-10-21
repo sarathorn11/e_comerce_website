@@ -22,32 +22,29 @@ namespace e_comerce_website.Pages
             LoadProducts();
         }
 
-        private void LoadProducts()
+        public void LoadProducts()
         {
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    string sql = "SELECT * FROM [dbo].[Products]";
+                    string sql = "SELECT product_id, product_name, product_category, product_price, product_qty, product_discount, product_description FROM [dbo].[Products]";
                     using (SqlCommand cmd = new SqlCommand(sql, connection))
                     {
                         using (SqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                StoreProduct product = new StoreProduct
+                                var product = new StoreProduct
                                 {
                                     product_id = reader.GetInt32(0),
                                     product_name = reader.GetString(1),
                                     product_category = reader.GetString(2),
                                     product_price = reader.GetDecimal(3),
                                     product_qty = reader.GetInt32(4),
-                                    product_img = reader.GetString(5),
-                                    product_discount = reader.GetDecimal(6),
-                                    product_description = reader.GetString(7),
-                                    product_availability = reader.GetBoolean(8),
-                                    product_favorite = reader.GetBoolean(9)
+                                    product_discount = reader.GetDecimal(5),
+                                    product_description = reader.GetString(6)
                                 };
                                 Products.Add(product);
                             }
@@ -55,86 +52,67 @@ namespace e_comerce_website.Pages
                     }
                 }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-                errorMessage = "Error: " + ex.Message;
+                errorMessage = "Error loading products: " + ex.Message;
             }
         }
 
-        public IActionResult OnGetEdit(int id)
+        public IActionResult OnPostSave()
         {
-            try
+            if (CurrentProduct == null)
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    string sql = "SELECT * FROM [dbo].[Products] WHERE product_id = @Id";
-                    using (SqlCommand cmd = new SqlCommand(sql, connection))
-                    {
-                        cmd.Parameters.AddWithValue("@Id", id);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if (reader.Read())
-                            {
-                                CurrentProduct.product_id = reader.GetInt32(0);
-                                CurrentProduct.product_name = reader.GetString(1);
-                                CurrentProduct.product_category = reader.GetString(2);
-                                CurrentProduct.product_price = reader.GetDecimal(3);
-                                CurrentProduct.product_qty = reader.GetInt32(4);
-                                CurrentProduct.product_img = reader.GetString(5);
-                                CurrentProduct.product_discount = reader.GetDecimal(6);
-                                CurrentProduct.product_description = reader.GetString(7);
-                                CurrentProduct.product_availability = reader.GetBoolean(8);
-                                CurrentProduct.product_favorite = reader.GetBoolean(9);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                errorMessage = "Error: " + ex.Message;
-            }
-
-            return Page();
-        }
-
-        public IActionResult OnPostUpdate()
-        {
-            if (!ModelState.IsValid)
-            {
+                errorMessage = "Product details are required.";
                 return Page();
             }
 
-            try
+            if (ModelState.IsValid)
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                try
                 {
-                    connection.Open();
-                    string sql = "UPDATE [dbo].[Products] SET product_name = @Name, product_category = @Category, product_price = @Price, product_qty = @Qty, product_img = @Img, product_discount = @Discount, product_description = @Description, product_availability = @Availability, product_favorite = @Favorite WHERE product_id = @Id";
-                    using (SqlCommand cmd = new SqlCommand(sql, connection))
+                    using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        cmd.Parameters.AddWithValue("@Id", CurrentProduct.product_id);
-                        cmd.Parameters.AddWithValue("@Name", CurrentProduct.product_name);
-                        cmd.Parameters.AddWithValue("@Category", CurrentProduct.product_category);
-                        cmd.Parameters.AddWithValue("@Price", CurrentProduct.product_price);
-                        cmd.Parameters.AddWithValue("@Qty", CurrentProduct.product_qty);
-                        cmd.Parameters.AddWithValue("@Img", CurrentProduct.product_img);
-                        cmd.Parameters.AddWithValue("@Discount", CurrentProduct.product_discount);
-                        cmd.Parameters.AddWithValue("@Description", CurrentProduct.product_description);
-                        cmd.Parameters.AddWithValue("@Availability", CurrentProduct.product_availability);
-                        cmd.Parameters.AddWithValue("@Favorite", CurrentProduct.product_favorite);
-                        cmd.ExecuteNonQuery();
+                        connection.Open();
+                        if (CurrentProduct.product_id > 0) // Update existing product
+                        {
+                            string sql = "UPDATE [dbo].[Products] SET product_name = @product_name, product_category = @product_category, product_price = @product_price, product_qty = @product_qty, product_discount = @product_discount, product_description = @product_description WHERE product_id = @product_id";
+                            using (SqlCommand cmd = new SqlCommand(sql, connection))
+                            {
+                                cmd.Parameters.AddWithValue("@product_id", CurrentProduct.product_id);
+                                cmd.Parameters.AddWithValue("@product_name", CurrentProduct.product_name);
+                                cmd.Parameters.AddWithValue("@product_category", CurrentProduct.product_category);
+                                cmd.Parameters.AddWithValue("@product_price", CurrentProduct.product_price);
+                                cmd.Parameters.AddWithValue("@product_qty", CurrentProduct.product_qty);
+                                cmd.Parameters.AddWithValue("@product_discount", CurrentProduct.product_discount);
+                                cmd.Parameters.AddWithValue("@product_description", CurrentProduct.product_description);
+                                cmd.ExecuteNonQuery();
+                            }
+                            successMessage = "Product updated successfully!";
+                        }
+                        else // Create new product
+                        {
+                            string sql = "INSERT INTO [dbo].[Products] (product_name, product_category, product_price, product_qty, product_discount, product_description) VALUES (@product_name, @product_category, @product_price, @product_qty, @product_discount, @product_description)";
+                            using (SqlCommand cmd = new SqlCommand(sql, connection))
+                            {
+                                cmd.Parameters.AddWithValue("@product_name", CurrentProduct.product_name);
+                                cmd.Parameters.AddWithValue("@product_category", CurrentProduct.product_category);
+                                cmd.Parameters.AddWithValue("@product_price", CurrentProduct.product_price);
+                                cmd.Parameters.AddWithValue("@product_qty", CurrentProduct.product_qty);
+                                cmd.Parameters.AddWithValue("@product_discount", CurrentProduct.product_discount);
+                                cmd.Parameters.AddWithValue("@product_description", CurrentProduct.product_description);
+                                cmd.ExecuteNonQuery();
+                            }
+                            successMessage = "Product created successfully!";
+                        }
+
+                        LoadProducts(); // Refresh the product list
                     }
                 }
-                successMessage = "Product updated successfully!";
+                catch (SqlException ex)
+                {
+                    errorMessage = "Error saving product: " + ex.Message;
+                }
             }
-            catch (Exception ex)
-            {
-                errorMessage = "Error: " + ex.Message;
-            }
-
-            LoadProducts(); // Refresh the product list
             return Page();
         }
 
@@ -146,22 +124,20 @@ namespace e_comerce_website.Pages
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    string deleteSql = "DELETE FROM Products WHERE product_id = @ProductID"; // Actual deletion
-                    using (SqlCommand deleteCmd = new SqlCommand(deleteSql, connection))
+                    string sql = "DELETE FROM [dbo].[Products] WHERE product_id = @product_id";
+                    using (SqlCommand cmd = new SqlCommand(sql, connection))
                     {
-                        deleteCmd.Parameters.AddWithValue("@ProductID", id);
-                        deleteCmd.ExecuteNonQuery();
+                        cmd.Parameters.AddWithValue("@product_id", id);
+                        cmd.ExecuteNonQuery();
                     }
-
-                    successMessage = "Product deleted successfully.";
                 }
+                successMessage = "Product deleted successfully!";
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-                errorMessage = "Error: " + ex.Message;
+                errorMessage = "Error deleting product: " + ex.Message;
             }
-
-            LoadProducts();
+            LoadProducts(); // Refresh the product list
             return Page();
         }
     }
@@ -173,10 +149,7 @@ namespace e_comerce_website.Pages
         public string product_category { get; set; }
         public decimal product_price { get; set; }
         public int product_qty { get; set; }
-        public string product_img { get; set; }
         public decimal product_discount { get; set; }
         public string product_description { get; set; }
-        public bool product_availability { get; set; }
-        public bool product_favorite { get; set; }
     }
 }
