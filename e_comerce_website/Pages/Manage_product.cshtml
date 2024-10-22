@@ -7,9 +7,6 @@
 @if (!string.IsNullOrEmpty(Model.successMessage))
 {
     <div class="alert alert-success">@Model.successMessage</div>
-    <script>
-        setSaved(); // Call this to indicate saving was successful
-    </script>
 }
 
 @if (!string.IsNullOrEmpty(Model.errorMessage))
@@ -19,7 +16,8 @@
 
 <div style="display: flex; gap: 20px;">
     <div class="modal-body" style="flex: 1;">
-        <form method="post" class="product-form" asp-page-handler="Save" enctype="multipart/form-data" onclick="clearForm()">
+        <h3>Product Form</h3>
+        <form method="post" class="product-form" asp-page-handler="Save" enctype="multipart/form-data">
             <input type="hidden" asp-for="CurrentProduct.product_id" id="product-id" />
 
             <!-- Product Name -->
@@ -71,7 +69,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <button type="submit" id="form-submit-btn" class="btn btn-primary">@(Model.CurrentProduct.product_id > 0 ? "Update Product" : "Save Changes")</button>
             </div>
         </form>
     </div>
@@ -105,7 +103,9 @@
                             <td>@product.product_description</td>
                             <td>
                                 <div style="display: flex; gap: 10px;">
-                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#productModal" onclick="populateForm(@Html.Raw(Json.Serialize(product)))">Edit</button>
+                                    <form method="post" asp-page-handler="Edit" asp-route-id="@product.product_id" style="display:inline;">
+                                        <button type="submit" class="btn btn-warning">Edit</button>
+                                    </form>
 
                                     <form method="post" asp-page-handler="Delete" style="display:inline;">
                                         <input type="hidden" name="id" value="@product.product_id" />
@@ -121,32 +121,14 @@
     </div>
 </div>
 
-<script>
-
-    // Handle form submission
-    function clearForm()
-        console.log("helloooooooooooooooooooooooooooooooooooooooooooooooooo")
-        document.querySelector('#product-id').value = '';
-        document.querySelector('#product-name').value = '';
-        document.querySelector('#product-category').value = '';
-        document.querySelector('#product-price').value = '';
-        document.querySelector('#product-qty').value = '';
-        document.querySelector('#product-discount').value = '';
-        document.querySelector('#product-description').value = '';
-            }
-        // This will trigger the form submission
-        return true; // Allow the form to submit and process on server-side
-    }
-</script>
-
 <style>
     .flex-container {
         display: flex;
-        flex-direction: column; /* Or 'row' based on your preference */
-        gap: 20px; /* Adjust the gap between items as needed */
+        flex-direction: column;
+        gap: 20px;
     }
 
     .table-container {
-        flex: 1; /* Allow the table to grow */
+        flex: 1;
     }
 </style>
