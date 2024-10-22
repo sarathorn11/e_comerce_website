@@ -58,6 +58,47 @@ namespace e_comerce_website.Pages
             }
         }
 
+        public IActionResult OnPostEdit(int id)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sql = "SELECT product_id, product_name, product_category, product_price, product_qty, product_discount, product_description FROM [dbo].[Products] WHERE product_id = @product_id";
+                    using (SqlCommand cmd = new SqlCommand(sql, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@product_id", id);
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                CurrentProduct = new StoreProduct
+                                {
+                                    product_id = reader.GetInt32(0),
+                                    product_name = reader.GetString(1),
+                                    product_category = reader.GetString(2),
+                                    product_price = reader.GetDecimal(3),
+                                    product_qty = reader.GetInt32(4),
+                                    product_discount = reader.GetDecimal(5),
+                                    product_description = reader.GetString(6)
+                                };
+                            }
+                            else
+                            {
+                                errorMessage = "Product not found.";
+                            }
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                errorMessage = "Error loading product: " + ex.Message;
+            }
+            return Page();
+        }
+
         public IActionResult OnPostSave()
         {
             if (CurrentProduct == null)
@@ -106,6 +147,10 @@ namespace e_comerce_website.Pages
                         }
 
                         LoadProducts(); // Refresh the product list
+
+                        // Clear the CurrentProduct to reset the form
+                        CurrentProduct = new StoreProduct(); // Reset form fields
+                        return RedirectToPage(); // This refreshes the page
                     }
                 }
                 catch (SqlException ex)
@@ -115,7 +160,6 @@ namespace e_comerce_website.Pages
             }
             return Page();
         }
-
 
         public IActionResult OnPostDelete(int id)
         {
