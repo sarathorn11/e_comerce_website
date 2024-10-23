@@ -47,7 +47,7 @@
                     </ul>
                 </div>
                 <div class="header__top__right__auth">
-                    <a href="#"><i class="fa fa-user"></i> Login</a>
+                    <a asp-page="/Login"><i class="fa fa-user"></i> Login</a>
                 </div>
             </div>
             <nav class="humberger__menu__nav mobile-menu">
@@ -76,7 +76,11 @@
             </div>
             <div class="humberger__menu__contact">
                 <ul>
-                    <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
+                    <li>
+                        <i class="fa fa-envelope"></i>
+                       @*  @Context.Session.GetString("UserEmail") ?? "No email available" *@
+                    </li>
+
                     <li>Free Shipping for all Order of $99</li>
                 </ul>
             </div>
@@ -114,8 +118,9 @@
                                     </ul>
                                 </div>
                                 <div class="header__top__right__auth">
-                                    <a href="#"><i class="fa fa-user"></i> Login</a>
+                                    <a asp-area="" asp-page="./Login_page"><i class="fa fa-user"></i> Login</a>
                                 </div>
+
                             </div>
                         </div>
                     </div>
@@ -175,6 +180,7 @@
                                 <li><a asp-area="" asp-page="/Shoping_cart"><i class="fa fa-shopping-bag"></i> <span>3</span></a></li>
                             </ul>
                             <div class="header__cart__price">item: <span>$150.00</span></div>
+                            
                         </div>
                     </div>
                 </div>
