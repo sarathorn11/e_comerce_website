@@ -1,0 +1,50 @@
+﻿@page
+@model e_comerce_website.Pages.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+
+
+<div class="login-container">
+    <p class="text-center">Login</p>
+    <form method="post">
+        <div class="form-group">
+            <label asp-for="Input.Username"></label>
+            <input asp-for="Input.Username" class="form-control" />
+            <span asp-validation-for="Input.Username" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Input.Password"></label>
+            <input asp-for="Input.Password" type="password" class="form-control" />
+            <span asp-validation-for="Input.Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group text-center">
+            <input type="submit" value="Login" class="btn btn-primary" />
+        </div>
+    </form>
+
+    <div class="text-center">
+        <a asp-page="./Register_page">Register</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .login-container {
+        width: 30%;                 /* Sets the width of the form container */
+        margin: 50px auto;           /* Centers the form horizontally and adds vertical spacing */
+        padding: 20px;               /* Adds padding inside the form */
+        border: 1px solid #ccc;      /* Adds a border around the form */
+        border-radius: 8px;          /* Rounds the corners */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for a 3D effect */
+        background-color: #f9f9f9;   /* Light background color for the form */
+    }
+
+
+</style>
