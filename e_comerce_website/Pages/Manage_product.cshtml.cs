@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace e_comerce_website.Pages
 {
@@ -17,24 +18,24 @@ namespace e_comerce_website.Pages
         public string errorMessage { get; private set; } = "";
         public string successMessage { get; private set; } = "";
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            LoadProducts();
+            await LoadProductsAsync();
         }
 
-        public void LoadProducts()
+        public async Task LoadProductsAsync()
         {
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
                     string sql = "SELECT product_id, product_name, product_category, product_price, product_qty, product_discount, product_description FROM [dbo].[Products]";
                     using (SqlCommand cmd = new SqlCommand(sql, connection))
                     {
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            while (reader.Read())
+                            while (await reader.ReadAsync())
                             {
                                 var product = new StoreProduct
                                 {
@@ -58,20 +59,20 @@ namespace e_comerce_website.Pages
             }
         }
 
-        public IActionResult OnPostEdit(int id)
+        public async Task<IActionResult> OnPostEditAsync(int id)
         {
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
                     string sql = "SELECT product_id, product_name, product_category, product_price, product_qty, product_discount, product_description FROM [dbo].[Products] WHERE product_id = @product_id";
                     using (SqlCommand cmd = new SqlCommand(sql, connection))
                     {
                         cmd.Parameters.AddWithValue("@product_id", id);
-                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
-                            if (reader.Read())
+                            if (await reader.ReadAsync())
                             {
                                 CurrentProduct = new StoreProduct
                                 {
@@ -99,7 +100,7 @@ namespace e_comerce_website.Pages
             return Page();
         }
 
-        public IActionResult OnPostSave()
+        public async Task<IActionResult> OnPostSaveAsync()
         {
             if (CurrentProduct == null)
             {
@@ -113,7 +114,7 @@ namespace e_comerce_website.Pages
                 {
                     using (SqlConnection connection = new SqlConnection(connectionString))
                     {
-                        connection.Open();
+                        await connection.OpenAsync();
                         if (CurrentProduct.product_id > 0) // Update existing product
                         {
                             string sql = "UPDATE [dbo].[Products] SET product_name = @product_name, product_category = @product_category, product_price = @product_price, product_qty = @product_qty, product_discount = @product_discount, product_description = @product_description WHERE product_id = @product_id";
@@ -126,7 +127,7 @@ namespace e_comerce_website.Pages
                                 cmd.Parameters.AddWithValue("@product_qty", CurrentProduct.product_qty);
                                 cmd.Parameters.AddWithValue("@product_discount", CurrentProduct.product_discount);
                                 cmd.Parameters.AddWithValue("@product_description", CurrentProduct.product_description);
-                                cmd.ExecuteNonQuery();
+                                await cmd.ExecuteNonQueryAsync();
                             }
                             successMessage = "Product updated successfully!";
                         }
@@ -141,16 +142,14 @@ namespace e_comerce_website.Pages
                                 cmd.Parameters.AddWithValue("@product_qty", CurrentProduct.product_qty);
                                 cmd.Parameters.AddWithValue("@product_discount", CurrentProduct.product_discount);
                                 cmd.Parameters.AddWithValue("@product_description", CurrentProduct.product_description);
-                                cmd.ExecuteNonQuery();
+                                await cmd.ExecuteNonQueryAsync();
                             }
                             successMessage = "Product created successfully!";
                         }
 
-                        LoadProducts(); // Refresh the product list
-
-                        // Clear the CurrentProduct to reset the form
+                        await LoadProductsAsync(); // Refresh the product list
                         CurrentProduct = new StoreProduct(); // Reset form fields
-                        return RedirectToPage(); // This refreshes the page
+                        return RedirectToPage(); // Refresh the page
                     }
                 }
                 catch (SqlException ex)
@@ -161,18 +160,26 @@ namespace e_comerce_website.Pages
             return Page();
         }
 
-        public IActionResult OnPostDelete(int id)
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
+            // Check for dependencies in the product_detail table
+            if (await HasRelatedRecordsAsync(id))
+            {
+                errorMessage = "Cannot delete product because it has related records in product_detail.";
+                await LoadProductsAsync(); // Refresh the product list
+                return Page();
+            }
+
             try
             {
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
                     string sql = "DELETE FROM [dbo].[Products] WHERE product_id = @product_id";
                     using (SqlCommand cmd = new SqlCommand(sql, connection))
                     {
                         cmd.Parameters.AddWithValue("@product_id", id);
-                        cmd.ExecuteNonQuery();
+                        await cmd.ExecuteNonQueryAsync();
                     }
                 }
                 successMessage = "Product deleted successfully!";
@@ -181,8 +188,24 @@ namespace e_comerce_website.Pages
             {
                 errorMessage = "Error deleting product: " + ex.Message;
             }
-            LoadProducts(); // Refresh the product list
+            await LoadProductsAsync(); // Refresh the product list
             return Page();
+        }
+
+        // Helper method to check for related records in the product_detail table
+        private async Task<bool> HasRelatedRecordsAsync(int productId)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                string sql = "SELECT COUNT(*) FROM [dbo].[product_detail] WHERE ProductID = @productId";
+                using (SqlCommand cmd = new SqlCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@productId", productId);
+                    int count = (int)await cmd.ExecuteScalarAsync();
+                    return count > 0; // Return true if there are related records
+                }
+            }
         }
     }
 

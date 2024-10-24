@@ -22,6 +22,8 @@
 
 </head>
 <body>
+    @inject IHttpContextAccessor HttpContextAccessor
+
     <div>
         <!-- Humberger Begin -->
         <div class="humberger__menu__overlay"></div>
@@ -95,7 +97,8 @@
                         <div class="col-lg-6 col-md-6">
                             <div class="header__top__left">
                                 <ul>
-                                    <li><i class="fa fa-envelope"></i> hello@colorlib.com</li>
+                                    @* <li><i class="fa fa-envelope"></i> hello@colorlib.com</li> *@
+                                    <li>Email:<span style="font-weight:bold;">  @Context.Session.GetString("UserEmail")</span></li>
                                     <li>Free Shipping for all Order of $99</li>
                                 </ul>
                             </div>
@@ -118,7 +121,9 @@
                                     </ul>
                                 </div>
                                 <div class="header__top__right__auth">
+
                                     <a asp-area="" asp-page="./Login_page"><i class="fa fa-user"></i> Login</a>
+
                                 </div>
 
                             </div>
@@ -142,26 +147,16 @@
                                 <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Shop" ? "active" : "")">
                                     <a asp-area="" asp-page="/Shop">Shop</a>
                                 </li>
-                                <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Manage_product" ? "active" : "")">
+                               @*  <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Manage_product" ? "active" : "")">
                                     <a asp-area="" asp-page="/Manage_product">Admin</a>
-                                </li>
-                                @* <li>
-                                    <a href="#">Pages</a>
-                                    <ul class="header__menu__dropdown">
-                                        <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Shop_detail" ? "active" : "")">
-                                            <a asp-area="" asp-page="/Shop_detail">Shop Details</a>
-                                        </li>
-                                        <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Shoping_cart" ? "active" : "")">
-                                            <a asp-area="" asp-page="/Shoping_cart">Shopping Cart</a>
-                                        </li>
-                                        <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Check_out" ? "active" : "")">
-                                            <a asp-area="" asp-page="/Check_out">Check Out</a>
-                                        </li>
-                                        <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Blog_detail" ? "active" : "")">
-                                            <a asp-area="" asp-page="/Blog_detail">Blog Detail</a>
-                                        </li>
-                                    </ul>
                                 </li> *@
+                                    
+                                @if (HttpContextAccessor.HttpContext.Session.GetString("UserRole") == "seller")
+                                {
+                                    <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Manage_product" ? "active" : "")">
+                                        <a asp-area="" asp-page="/Manage_product">Admin</a>
+                                    </li>
+                                }
                                 <li class="@(ViewContext.RouteData.Values["page"]?.ToString() == "/Blog" ? "active" : "")">
                                     <a asp-area="" asp-page="/Blog">Blog</a>
                                 </li>
